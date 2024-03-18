@@ -1,0 +1,149 @@
+{% extends 'base.html.twig' %}
+
+{% block meta %}
+    <meta name="base_url" content="http://www.fgtechs.fr/z-pedro/wwwluxuryservices">
+    <meta name="csrf-token" content="9Tnm0YBCxgVTxoqI1HzccsU5NuE9RughZmhpzgXn">
+    <!--  favicon -->
+    <link rel="shortcut icon" href="{{asset("assets/img/ico/fav.png")}}">
+    
+{% endblock %}
+
+{% block body %}
+
+<div class="base">
+
+    <!-- Page -->
+    <div class="page">
+
+        <!-- Page Header-->
+        <section class="page-title page-title-bg fixed-bg overlay dark-5 padding-top-160 padding-bottom-80">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="white-text">{{job.jobTitle}}</h2>
+                        <span class="white-text">Ref. {{job.reference}}</span>
+                        <ol class="breadcrumb">
+                            <li>
+                                <div class="portfolio-nav">
+                                    <a href="#!" class="waves-effect waves-dark"><i class="fa fa-angle-left" aria-hidden="true"></i> Prev</a>
+                                    <a href="#!" class="waves-effect waves-dark"><i class="fa fa-th-large" aria-hidden="true"></i></a>
+                                    <a href="#!" class="waves-effect waves-dark">Next <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                </div>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Page Content-->
+        <section class="single-project-section section-padding light-gray-bg">
+            <div class="container">
+                <div class="project-overview">
+                    <div class="row mb-80">
+                        <div class="col-xs-12 col-md-8">
+                            <p class="ref grey-text no-margin">Ref. {{job.reference}}</p>
+                            <h2>{{job.jobTitle}}</h2>
+                            <p>{{job.description|striptags}}</p>
+                            {# <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent nec tortor venenatis, consequat quam et, varius lorem. Vivamus auctor vehicula odio, non scelerisque nibh cursus maximus. Sed hendrerit eros libero, vel accumsan nisi sagittis sit amet. Vivamus vitae neque convallis, consectetur lectus ac, pellentesque massa. Morbi finibus faucibus lorem vel placerat. Vivamus neque ligula, lacinia ac arcu sed, egestas mattis felis. Pellentesque tincidunt nulla lorem, ut sollicitudin metus volutpat ut. Vivamus et dignissim elit. </p>
+                            <p>Vivamus id congue massa. Praesent ornare ipsum dolor, ut semper sapien tempus non. Integer eget dui vehicula nisi rutrum interdum et id turpis. Nam eu mollis sem. Aenean in hendrerit neque. Morbi rhoncus lacinia risus ac mattis. Pellentesque a mauris sapien. Nunc sit amet accumsan massa. Nulla gravida porttitor luctus. Aliquam fringilla at quam non euismod. Phasellus eu gravida eros. Cras odio risus, blandit non suscipit sed, volutpat vitae nulla. In ultrices at leo sit amet interdum.</p> #}
+                        </div>
+
+                        <div class="col-xs-12 col-md-4 quick-overview">
+                            <ul class="portfolio-meta">
+                                <li><span> Pulished at </span>{{job.createdAt|date("Y-m-d")}}</li>
+                                <li><span> Position </span>{{job.position}}r</li>
+                                <li><span> Contract Type </span>{{job.jobType}}</li>
+                                <li><span> Salary </span>{{job.salary / 1000 |round}}k &euro;</li>
+                                <li><span> Location </span>{{job.location}}</li>
+                                <li><span> Starting date </span>{{job.createdAt|date("Y-m-d")}}</li>
+                            </ul>
+
+                            {% set currentCandidat = '' %}
+                            {% set existingApply = null %}
+
+                            {% for candidat in candidats %}
+                                {% if candidat.user == app.user %}
+                                    {% set currentCandidat = candidat %}
+                                {% endif %} 
+                            {% endfor %}
+
+                            {% for applyByJob in allAppliesByJob %}
+                                {% if applyByJob.candidat == currentCandidat %}
+                                    {% set existingApply = applyByJob %}
+                                {% endif %} 
+                            {% endfor %} 
+
+                            {% if existingApply %}
+                                    <div class="btn btn-block btn-success mt-30 waves-effect waves-light disabled">You have applied for this job</div>
+                                {% else %}
+                                    <a class="btn btn-block gradient primary mt-30 waves-effect waves-light" href="{{path('app_apply',{'userId': app.user.id, 'jobOfferId': job.id})}}">Apply for this job</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <nav class="single-post-navigation no-margin" role="navigation">
+                    <div class="row">
+
+                        <div class="col-xs-6 col-sm-6 col-md-4">
+                            <div class="previous-post-link">
+                            
+                                <a class="btn border primary waves-effect waves-dark"
+                                {% set reverseJobs = allJobs|reverse %}
+                                {% for jobinArray in reverseJobs %}
+                                    {% if  jobinArray.id == job.id  %}
+                                        {% if loop.index == allJobs|length  %}
+                                            {% set nextJob = reverseJobs[0] %}
+                                        {% else %}
+                                            {% set nextJob = reverseJobs[loop.index] %}
+                                        {% endif %}
+                                            href="{{path('app_job_show',{'id':nextJob.id})}}">
+                                    {% endif %}
+                                {% endfor %}
+                                    <i class="fa fa-long-arrow-left"></i>Previous
+                                </a>
+                            </div>
+                        </div>
+                        <div class="hidden-xs hidden-sm col-md-4"></div>
+
+
+                        <div class="col-xs-6 col-sm-6 col-md-4">
+                            <div class="next-post-link">
+                                <a class="btn border primary waves-effect waves-dark"
+                                {% for jobinArray in allJobs %}
+                                    {% if  jobinArray.id == job.id  %}
+                                        {% if loop.index == allJobs|length  %}
+                                            {% set nextJob = allJobs[0] %}
+                                        {% else %}
+                                            {% set nextJob = allJobs[loop.index] %}
+                                        {% endif %}
+                                            href="{{path('app_job_show',{'id':nextJob.id})}}">
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                    Next <i class="fa fa-long-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                    </div>
+                </nav>
+            </div>
+        </section>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block javascriptsBottom %}
+<script type="text/javascript">
+
+    onAppReady(function() {
+        $('.preload').remove();
+    });
+</script>
+
+{% endblock %}
